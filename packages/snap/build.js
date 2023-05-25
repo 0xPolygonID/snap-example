@@ -1,7 +1,13 @@
 const esbuild = require('esbuild');
 const plugin = require('node-stdlib-browser/helpers/esbuild/plugin');
 const { replace } = require('esbuild-plugin-replace');
-const stdLibBrowser = require('node-stdlib-browser');
+let stdLibBrowser = require('node-stdlib-browser');
+const path = require('path');
+
+stdLibBrowser = {
+  ...stdLibBrowser,
+  "@0xpolygonid/js-sdk": path.join(__dirname, '../../node_modules/@0xpolygonid/js-sdk/dist/esm/index.js')
+};
 
 console.log('START building ESM bundle...');
 esbuild.build({
@@ -11,18 +17,11 @@ esbuild.build({
   target: 'es2020',
   outfile: 'dist/bundle.js',
   sourcemap: false,
-  // sourcemap: 'inline',
   format: 'cjs',
   legalComments: 'none',
   treeShaking: true,
   plugins: [
     plugin(stdLibBrowser),
-
-    replace({
-      'eval(': 'REPLACEDeval(',
-      'import(': 'REPLACEDimport(',
-      codeToReplace: '',
-    }),
   ],
   define: {
     Buffer: 'Buffer',
@@ -30,8 +29,5 @@ esbuild.build({
     process: 'process',
   },
   inject: [require.resolve('node-stdlib-browser/helpers/esbuild/shim')],
-  loader: {
-    '.worker.js': 'text',
-  },
 });
 console.log('FINISH building ESM bundle');
