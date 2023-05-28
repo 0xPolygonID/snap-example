@@ -81,34 +81,6 @@ bundleString = bundleString.replaceAll(
 // Fix TextEncoder and TextDecoder
 bundleString = bundleString.replace('var empty2 = null;', 'var empty2 = {};');
 
-// Fix TextEncoder and TextDecoder
-bundleString = bundleString.replace(
-  'const textEncoder = new TextEncoder();',
-  '',
-);
-
-bundleString = bundleString.replace(
-  'const textDecoder = new TextDecoder();',
-  '',
-);
-bundleString = bundleString.replace('textEncoder.', 'new TextEncoder().');
-bundleString = bundleString.replace('textDecoder.', 'new TextDecoder().');
-
-// Fix import error
-bundleString = bundleString.replaceAll('.import(', '.importPKey(');
-bundleString = bundleString.replaceAll('import(args)', 'importPKey(args)');
-
-// // Fix root errors
-// bundleString = bundleString.replaceAll(
-//   "var coreJsData = root['__core-js_shared__'];",
-//   "if(root) {var coreJsData = root['__core-js_shared__'];}",
-// );
-
-bundleString = bundleString.replaceAll(
-  'var Symbol = root.Symbol',
-  'if(root)var Symbol = root.Symbol',
-);
-
 // eslint-disable-next-line node/no-sync
 fs.writeFileSync(bundlePath, bundleString);
 console.log('Bundle replaced code to SES', bundlePath);

@@ -4,18 +4,15 @@ import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 
 import {
-  // AuthHandler,
   BasicMessage,
   W3CCredential,
-  // FetchHandler,
-  // W3CCredential,
 } from '@0xpolygonid/js-sdk';
-// import { DID } from '@iden3/js-iden3-core';
 
 import { ExtensionService } from './services/Extension.service';
 import { IdentityServices } from './services/Identity.services';
-import { confirmRpcDialog } from './rpc/methods';
+import { alertRpcDialog, confirmRpcDialog } from './rpc/methods';
 import { authMethod, proofMethod, receiveMethod } from './services';
+import { DID } from '@iden3/js-iden3-core';
 
 const byteEncoder = new TextEncoder();
 
@@ -51,22 +48,43 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   console.log('Origin:', origin);
 
   console.log(request);
-  await ExtensionService.init();
   switch (request.method) {
     case 'handleRequest': {
-      console.log(window);
-      console.log(request.params);
-      // await ExtensionService.init();
-      console.log('finish await ExtensionService.init();');
+      await ExtensionService.init();
 
-      const { packageMgr, credWallet } =
+      console.log('finish initialization');
+
+      const { packageMgr, credWallet, dataStorage } =
         ExtensionService.getExtensionServiceInstance();
 
+      const identities = await dataStorage.identity.getAllIdentities();
       const seedPhrase: Uint8Array = new TextEncoder().encode(
         'seedseedseedseedseedseedseedxxxx',
       );
-      const identity = await IdentityServices.createIdentity(seedPhrase);
-      console.log('await IdentityServices.createIdentity();');
+
+      // identity initialization
+      let did: DID;
+      if(identities?.length) {
+        const [firstIdentity] = identities;
+        did = DID.parse(firstIdentity.identifier);
+        console.log('DID read from storage');
+
+      } else {
+        const dialogContent = panel([
+          heading('Identity creation'),
+          divider(),
+          text(`You have not identity`),
+          text(`Would you like to create?`),
+        ]);
+        const res = await confirmRpcDialog(dialogContent);
+        if (res) {
+          const identity = await IdentityServices.createIdentity(seedPhrase);
+          did = identity.did;
+        } else return ;
+      }
+
+
+      console.log('identity created');
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const requestBase64 = getParams(request.params)?.request;
@@ -75,6 +93,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       const typeRequest = detectRequest(unpackedMessage);
       console.log(typeRequest);
       let dialogContent = null;
+      // handle request {Auth, Load cred, Proof}
       switch (typeRequest) {
         case RequestType.Auth: {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -88,7 +107,14 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           ]);
           const res = await confirmRpcDialog(dialogContent);
           if (res) {
-            await authMethod(identity, requestBase64);
+            try {
+              await authMethod(did, requestBase64);
+            } catch (e) {
+              console.log(e);
+              return await alertRpcDialog(panel([
+                heading('Error Authorization'),
+              ]));
+            }
           }
           break;
         }
@@ -114,25 +140,40 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           dialogContent = panel([...dialogContent, ...credsUI]);
           const res = await confirmRpcDialog(dialogContent);
           if (res) {
-            await receiveMethod(identity, requestBase64);
+            try {
+              await receiveMethod(did, requestBase64);
+            } catch (e) {
+              console.log(e);
+              return await alertRpcDialog(panel([
+                heading('Error Credential offer'),
+              ]));
+            }
           }
-          console.log(await credWallet.list());
-          // eslint-disable-next-line no-debugger
-          debugger;
           break;
         }
 
         case RequestType.Proof: {
-          // eslint-disable-next-line no-debugger
-          debugger;
-          await proofMethod(identity, requestBase64);
+          dialogContent = [
+            heading('Generate proof?'),
+          ];
+          dialogContent = panel([...dialogContent]);
+          const res = await confirmRpcDialog(dialogContent);
+          if(res) {
+            try {
+              await proofMethod(did, requestBase64);
+            } catch (e) {
+              console.log(e);
+              return await alertRpcDialog(panel([
+                heading('Error Proof'),
+              ]));
+            }
+          }
           break;
         }
         default:
           console.log(`not found request: ${typeRequest}`);
           break;
       }
-      // await authMethod(identity, requestBase64);
       return snap.request({
         method: 'snap_dialog',
         params: {

@@ -12,6 +12,18 @@ export const confirmRpcDialog = async (
     },
   });
 };
+export const alertRpcDialog = async (
+  content: Panel,
+  type: any = 'alert',
+) => {
+  return snap.request({
+    method: 'snap_dialog',
+    params: {
+      type,
+      content,
+    },
+  });
+};
 
 export const loadingRpcDialog = async (content: Panel, type: any = 'alert') => {
   return snap.request({
