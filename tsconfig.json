@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "module": "CommonJS",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "useUnknownInCatchVariables": false,
+
+    "esModuleInterop": true,
+
     "sourceMap": true,
     "strict": true,
     "target": "ES2017"

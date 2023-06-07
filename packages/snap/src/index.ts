@@ -1,18 +1,24 @@
 // eslint-disable-next-line import/no-unassigned-import
 import './polyfill-intl';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { divider, text, panel, heading, copyable } from '@metamask/snaps-ui';
 
 import {
   BasicMessage,
   W3CCredential,
+  base64ToBytes,
+  bytesToBase64,
+  core,
+  PROTOCOL_CONSTANTS,
+  hexToBytes,
+  bytesToBase64url,
 } from '@0xpolygonid/js-sdk';
 
+import { Wallet, sha256 } from 'ethers';
 import { ExtensionService } from './services/Extension.service';
 import { IdentityServices } from './services/Identity.services';
 import { alertRpcDialog, confirmRpcDialog } from './rpc/methods';
 import { authMethod, proofMethod, receiveMethod } from './services';
-import { DID } from '@iden3/js-iden3-core';
 
 const byteEncoder = new TextEncoder();
 
@@ -46,12 +52,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 }) => {
   console.log('Request:', JSON.stringify(request, null, 4));
   console.log('Origin:', origin);
-
+  await ExtensionService.init();
   console.log(request);
+
   switch (request.method) {
     case 'handleRequest': {
-      await ExtensionService.init();
-
       console.log('finish initialization');
 
       const { packageMgr, credWallet, dataStorage } =
@@ -64,11 +69,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
       // identity initialization
       let did: DID;
-      if(identities?.length) {
+      if (identities?.length) {
         const [firstIdentity] = identities;
         did = DID.parse(firstIdentity.identifier);
         console.log('DID read from storage');
-
       } else {
         const dialogContent = panel([
           heading('Identity creation'),
@@ -80,9 +84,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         if (res) {
           const identity = await IdentityServices.createIdentity(seedPhrase);
           did = identity.did;
-        } else return ;
+        } else {
+          return;
+        }
       }
-
 
       console.log('identity created');
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -111,9 +116,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
               await authMethod(did, requestBase64);
             } catch (e) {
               console.log(e);
-              return await alertRpcDialog(panel([
-                heading('Error Authorization'),
-              ]));
+              return await alertRpcDialog(
+                panel([heading('Error Authorization')]),
+              );
             }
           }
           break;
@@ -144,28 +149,24 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
               await receiveMethod(did, requestBase64);
             } catch (e) {
               console.log(e);
-              return await alertRpcDialog(panel([
-                heading('Error Credential offer'),
-              ]));
+              return await alertRpcDialog(
+                panel([heading('Error Credential offer')]),
+              );
             }
           }
           break;
         }
 
         case RequestType.Proof: {
-          dialogContent = [
-            heading('Generate proof?'),
-          ];
+          dialogContent = [heading('Generate proof?')];
           dialogContent = panel([...dialogContent]);
           const res = await confirmRpcDialog(dialogContent);
-          if(res) {
+          if (res) {
             try {
               await proofMethod(did, requestBase64);
             } catch (e) {
               console.log(e);
-              return await alertRpcDialog(panel([
-                heading('Error Proof'),
-              ]));
+              return await alertRpcDialog(panel([heading('Error Proof')]));
             }
           }
           break;
@@ -220,6 +221,94 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         method: 'snap_manageState',
         params: { operation: 'clear' },
       });
+    }
+
+    case 'signMessage': {
+      try {
+        // const instance = ExtensionService.getExtensionServiceInstance();
+        const privKey = await snap.request({
+          method: 'snap_getEntropy',
+          params: { version: 1 },
+        });
+
+        const ethWallet = new Wallet(privKey);
+        const message = (request.params as any).msg;
+        const result = await snap.request({
+          method: 'snap_dialog',
+          params: {
+            type: 'confirmation',
+            content: panel([
+              heading('Do you want to sign this message? '),
+              copyable(message),
+            ]),
+          },
+        });
+
+        if (!result) {
+          throw new Error('User rejected request');
+        }
+
+        const msgBts = base64ToBytes(message);
+        const { authHandler } = ExtensionService.getExtensionServiceInstance();
+        const did = core.DID.parse(
+          `did:pkh:poly:${ethWallet.address}#Recovery2020`,
+        );
+        console.log(did.string());
+        const { token, authResponse, authRequest } =
+          await authHandler.handleAuthorizationRequestForGenesisDID(
+            did,
+            msgBts,
+            {
+              mediaType: PROTOCOL_CONSTANTS.MediaType.SignedMessage,
+              did: did.string(),
+              kid: did.string(),
+              alg: 'ES256K-R',
+
+              signer: (_: any, msg: any) => {
+                return async () => {
+                  const signature: string = ethWallet.signingKey.sign(
+                    sha256(msg),
+                  ).serialized;
+                  const bytes = hexToBytes(signature);
+                  return bytesToBase64url(bytes);
+                };
+              },
+            },
+          );
+
+        console.log(token);
+        console.log(authRequest);
+        console.log(authResponse);
+
+        await fetch(`${authRequest?.body?.callbackUrl}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: token,
+        }).then((response) => {
+          console.log(response);
+
+          if (!response.ok) {
+            return Promise.reject(response);
+          }
+          return response;
+        });
+        // const resp = await fetch(authRequest!.body!.callbackUrl, {
+        //   headers: {
+        //     'Content-Type': 'application/x-www-form-urlencoded',
+        //   },
+        //   body: token,
+        //   method: 'POST',
+        // });
+        // console.log('final response');
+
+        // console.log(await resp.text());
+      } catch (e) {
+        console.error(e);
+        throw e;
+        /* empty */
+      }
     }
 
     default: {

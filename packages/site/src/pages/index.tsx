@@ -1,4 +1,4 @@
-import {useContext, useState} from 'react';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
@@ -10,13 +10,15 @@ import {
   getListCredentialRequest,
   sendHello,
   shouldDisplayReconnectButton,
+  signMessage,
 } from '../utils';
 import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
   SendHelloButton,
-  Card, TextButton,
+  Card,
+  TextButton,
 } from '../components';
 
 const Container = styled.div`
@@ -109,6 +111,10 @@ const Index = () => {
     'eyJpZCI6ImZiN2FkNWQyLTViNTAtNDVkYS04YjgwLTczMTcxZTIxN2Y3NCIsInR5cCI6ImFwcGxpY2F0aW9uL2lkZW4zY29tbS1wbGFpbi1qc29uIiwidHlwZSI6Imh0dHBzOi8vaWRlbjMtY29tbXVuaWNhdGlvbi5pby9hdXRob3JpemF0aW9uLzEuMC9yZXF1ZXN0IiwidGhpZCI6ImZiN2FkNWQyLTViNTAtNDVkYS04YjgwLTczMTcxZTIxN2Y3NCIsImJvZHkiOnsiY2FsbGJhY2tVcmwiOiJodHRwczovL2lzc3Vlci12Mi5wb2x5Z29uaWQubWUvYXBpL2NhbGxiYWNrP3Nlc3Npb25JZD05NDY3NjIiLCJyZWFzb24iOiJ0ZXN0IGZsb3ciLCJzY29wZSI6W119LCJmcm9tIjoiZGlkOnBvbHlnb25pZDpwb2x5Z29uOm11bWJhaToycUo2ODlrcG9KeGNTekI1c0FGSnRQc1NCU3JIRjVkcTcyMkJITXFVUkwifQ==',
   );
 
+  const [authRequestToSignBase64, setAuthRequestToSignBase64] = useState(
+    'eyJpZCI6ImZiN2FkNWQyLTViNTAtNDVkYS04YjgwLTczMTcxZTIxN2Y3NCIsInR5cCI6ImFwcGxpY2F0aW9uL2lkZW4zY29tbS1wbGFpbi1qc29uIiwidHlwZSI6Imh0dHBzOi8vaWRlbjMtY29tbXVuaWNhdGlvbi5pby9hdXRob3JpemF0aW9uLzEuMC9yZXF1ZXN0IiwidGhpZCI6ImZiN2FkNWQyLTViNTAtNDVkYS04YjgwLTczMTcxZTIxN2Y3NCIsImJvZHkiOnsiY2FsbGJhY2tVcmwiOiJodHRwczovL2lzc3Vlci12Mi5wb2x5Z29uaWQubWUvYXBpL2NhbGxiYWNrP3Nlc3Npb25JZD05NDY3NjIiLCJyZWFzb24iOiJ0ZXN0IGZsb3ciLCJzY29wZSI6W119LCJmcm9tIjoiZGlkOnBvbHlnb25pZDpwb2x5Z29uOm11bWJhaToycUo2ODlrcG9KeGNTekI1c0FGSnRQc1NCU3JIRjVkcTcyMkJITXFVUkwifQ==',
+  );
+
   const handleSendRequestClick = async () => {
     try {
       // setCurrentChainId(await getCurrentNetwork());
@@ -167,6 +173,19 @@ const Index = () => {
   const handleListCredential = async () => {
     try {
       const res = await getListCredentialRequest();
+      console.log(res);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleMsgSign = async () => {
+    console.log('handleMsgSign');
+    try {
+      console.log(authRequestToSignBase64);
+
+      const res = await signMessage(authRequestToSignBase64);
       console.log(res);
     } catch (e) {
       console.error(e);
@@ -260,6 +279,39 @@ const Index = () => {
                 onClick={handleListCredential}
                 disabled={!state.installedSnap}
               />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Handle message sign',
+            description: 'Handle message sign',
+            button: (
+              <TextButton
+                text={'Handle sign'}
+                onClick={handleMsgSign}
+                disabled={!state.installedSnap}
+              />
+            ),
+            form: (
+              <form>
+                <label>
+                  Enter request
+                  <textarea
+                    rows={15}
+                    style={{ width: '100%' }}
+                    value={authRequestToSignBase64}
+                    onChange={(e) => setAuthRequestToSignBase64(e.target.value)}
+                  />
+                </label>
+                <br />
+              </form>
             ),
           }}
           disabled={!state.installedSnap}
