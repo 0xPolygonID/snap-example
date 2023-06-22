@@ -36,6 +36,7 @@
     "@metamask/snaps-types": "^0.32.2",
     "@metamask/snaps-ui": "^0.32.2",
     "buffer": "^6.0.3",
+    "did-jwt": "^6.11.6",
     "ethers": "^6.4.0",
     "intl": "^1.2.5",
     "rdf-canonize-native": "^1.1.2"

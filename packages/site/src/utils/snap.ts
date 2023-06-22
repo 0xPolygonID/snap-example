@@ -12,6 +12,24 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
   })) as unknown as GetSnapsResponse;
 };
 
+// export const instantiateSDKServices = async (
+//   snapId: string = defaultSnapOrigin,
+// ) => {
+//   try {
+//     const result = await window.ethereum.request({
+//       method: 'wallet_invokeSnap',
+//       params: {
+//         snapId,
+//         request: { method: 'init_sdk_services' },
+//       },
+//     });
+//     console.log('init_sdk_services', result);
+//   } catch (error) {
+//     console.error(error);
+//     throw error;
+//   }
+// };
+
 /**
  * Connect a snap to MetaMask.
  *
@@ -22,12 +40,18 @@ export const connectSnap = async (
   snapId: string = defaultSnapOrigin,
   params: Record<'version' | string, unknown> = {},
 ) => {
-  await window.ethereum.request({
-    method: 'wallet_requestSnaps',
-    params: {
-      [snapId]: params,
-    },
-  });
+  try {
+    const result = await window.ethereum.request({
+      method: 'wallet_requestSnaps',
+      params: {
+        [snapId]: params,
+      },
+    });
+    console.log('connectSnap', result);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
 /**
@@ -126,13 +150,13 @@ export const signMessage = async (authRequestToSignBase64: string) => {
       console.error(error);
     }
   }
-  console.log('signMessage');
+
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapOrigin,
       request: {
-        method: 'signMessage',
+        method: 'auth',
         params: {
           msg: authRequestToSignBase64,
         },
