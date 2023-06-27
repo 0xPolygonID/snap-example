@@ -4,4 +4,5 @@
  */
 export const defaultSnapOrigin =
   process.env.SNAP_ORIGIN ?? `local:http://localhost:8080`;
-export const CIRCUITS_FETCH_PATH = 'http://localhost:4200/assets/circuits';
+export const CIRCUITS_FETCH_PATH =
+  process.env.CIRCUITS_FETCH_PATH ?? 'http://localhost:8000';

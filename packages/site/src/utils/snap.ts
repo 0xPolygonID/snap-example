@@ -12,24 +12,6 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
   })) as unknown as GetSnapsResponse;
 };
 
-// export const instantiateSDKServices = async (
-//   snapId: string = defaultSnapOrigin,
-// ) => {
-//   try {
-//     const result = await window.ethereum.request({
-//       method: 'wallet_invokeSnap',
-//       params: {
-//         snapId,
-//         request: { method: 'init_sdk_services' },
-//       },
-//     });
-//     console.log('init_sdk_services', result);
-//   } catch (error) {
-//     console.error(error);
-//     throw error;
-//   }
-// };
-
 /**
  * Connect a snap to MetaMask.
  *
