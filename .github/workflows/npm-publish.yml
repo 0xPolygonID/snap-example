@@ -15,7 +15,9 @@ jobs:
           node-version: 18
           registry-url: https://registry.npmjs.org/
       - run: yarn install
-      - run: cd packages/snap && yarn build
+      - run: yarn build
+        working-directory: packages/snap
       - run: yarn publish
+        working-directory: packages/snap
         env:
           NODE_AUTH_TOKEN: ${{secrets.POLYGONID_NPM_PUBLISH_TOKEN}}
