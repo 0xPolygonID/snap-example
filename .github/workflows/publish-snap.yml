@@ -1,4 +1,4 @@
-name: publish snap
+name: publish snap ui site
 
 on:
   workflow_dispatch:
@@ -16,9 +16,6 @@ jobs:
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
-        env:
-          CIRCUITS_FETCH_PATH: 'local:http://localhost'
-          SNAP_ORIGIN: 'http://localhost'
         with:
           node-version: ${{ matrix.node-version }}
 

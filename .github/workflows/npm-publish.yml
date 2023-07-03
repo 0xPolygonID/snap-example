@@ -1,4 +1,4 @@
-name: Publish package to NPM
+name: Publish SNAP package to NPM
 
 on:
   workflow_dispatch:
