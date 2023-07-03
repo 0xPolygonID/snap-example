@@ -1,18 +1,18 @@
 {
-  "version": "0.1.0",
-  "description": "An example Snap written in TypeScript.",
+  "version": "1.0.0",
+  "description": "PolygonID MetaMask snap example",
   "proposedName": "TypeScript Example Snap",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/0xPolygonID/snap-example.git"
   },
   "source": {
-    "shasum": "dTY+xDtO4hGFN557ke2yJ9n92fY9qoei8HpZKSa4cM4=",
+    "shasum": "MVJtsLiVxDpLEkjKcFWg38hI//bEXQGL+NCrFES/Mp4=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "snap",
+        "packageName": "@0xpolygonid/snap-example",
         "registry": "https://registry.npmjs.org/"
       }
     }

@@ -1,14 +1,13 @@
 {
-  "name": "snap",
-  "version": "0.1.0",
+  "name": "@0xpolygonid/snap-example",
+  "version": "1.0.0",
   "private": true,
-  "description": "The 'Hello, world!' of MetaMask Snaps, now written in TypeScript.",
+  "description": "PolygonID MetaMask Snaps example, written in TypeScript.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/0xPolygonID/snap-example.git"
   },
-  "license": "(MIT-0 OR Apache-2.0)",
-  "main": "src/index.ts",
+  "license": "AGPL-3.0",
   "files": [
     "dist/",
     "images/",
