@@ -3,15 +3,16 @@ import {
   CircuitStorage,
   InMemoryDataSource,
 } from '@0xpolygonid/js-sdk';
+import { CIRCUITS_FETCH_PATH } from '../../../site/src/config/snap';
 
 const load = (path: string) => {
-  return fetch(`http://localhost:8000${path}`);
+  return fetch(`${CIRCUITS_FETCH_PATH}${path}`);
 };
 export class CircuitStorageInstance {
   static instanceCS: CircuitStorage;
 
   static async init() {
-    const authW = await load('/AuthV2/circuit.wasm')
+    const authW = await load('/authV2/circuit.wasm')
       .then((response) => response.arrayBuffer())
       .then((buffer) => new Uint8Array(buffer));
     const mtpW = await load('/credentialAtomicQueryMTPV2/circuit.wasm')
@@ -21,7 +22,7 @@ export class CircuitStorageInstance {
       .then((response) => response.arrayBuffer())
       .then((buffer) => new Uint8Array(buffer));
 
-    const authZ = await load('/AuthV2/circuit_final.zkey')
+    const authZ = await load('/authV2/circuit_final.zkey')
       .then((response) => response.arrayBuffer())
       .then((buffer) => new Uint8Array(buffer));
     const mtpZ = await load('/credentialAtomicQueryMTPV2/circuit_final.zkey')
@@ -31,7 +32,7 @@ export class CircuitStorageInstance {
       .then((response) => response.arrayBuffer())
       .then((buffer) => new Uint8Array(buffer));
 
-    const authJ = await load('/AuthV2/verification_key.json')
+    const authJ = await load('/authV2/verification_key.json')
       .then((response) => response.arrayBuffer())
       .then((buffer) => new Uint8Array(buffer));
     const mtpJ = await load('/credentialAtomicQueryMTPV2/verification_key.json')
@@ -44,21 +45,21 @@ export class CircuitStorageInstance {
     if (!this.instanceCS) {
       this.instanceCS = new CircuitStorage(new InMemoryDataSource());
       await this.instanceCS.saveCircuitData(CircuitId.AuthV2, {
-        circuitId: 'authV2'.toString(),
+        circuitId: 'authV2',
         wasm: authW,
         provingKey: authZ,
         verificationKey: authJ,
       });
 
       await this.instanceCS.saveCircuitData(CircuitId.AtomicQueryMTPV2, {
-        circuitId: 'credentialAtomicQueryMTPV2'.toString(),
+        circuitId: 'credentialAtomicQueryMTPV2',
         wasm: mtpW,
         provingKey: mtpZ,
         verificationKey: mtpJ,
       });
 
       await this.instanceCS.saveCircuitData(CircuitId.AtomicQuerySigV2, {
-        circuitId: 'credentialAtomicQuerySigV2'.toString(),
+        circuitId: 'credentialAtomicQuerySigV2',
         wasm: sigW,
         provingKey: sigZ,
         verificationKey: sigJ,

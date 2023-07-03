@@ -22,12 +22,18 @@ export const connectSnap = async (
   snapId: string = defaultSnapOrigin,
   params: Record<'version' | string, unknown> = {},
 ) => {
-  await window.ethereum.request({
-    method: 'wallet_requestSnaps',
-    params: {
-      [snapId]: params,
-    },
-  });
+  try {
+    const result = await window.ethereum.request({
+      method: 'wallet_requestSnaps',
+      params: {
+        [snapId]: params,
+      },
+    });
+    console.log('connectSnap', result);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
 /**
@@ -99,6 +105,43 @@ export const getListCredentialRequest = async () => {
       snapId: defaultSnapOrigin,
       request: {
         method: 'get_list_creds',
+      },
+    },
+  });
+};
+
+export const signMessage = async (authRequestToSignBase64: string) => {
+  try {
+    const permissions: any[] = await window.ethereum.request({
+      method: 'wallet_requestPermissions',
+      params: [{ eth_accounts: {} }],
+    });
+    console.log('permissions', permissions);
+
+    const accountsPermission = permissions.find(
+      (permission) => permission.parentCapability === 'eth_accounts',
+    );
+    if (accountsPermission) {
+      console.log('eth_accounts permission successfully requested!');
+    }
+  } catch (error) {
+    if (error.code === 4001) {
+      // EIP-1193 userRejectedRequest error
+      console.log('Permissions needed to continue.');
+    } else {
+      console.error(error);
+    }
+  }
+
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'auth',
+        params: {
+          msg: authRequestToSignBase64,
+        },
       },
     },
   });

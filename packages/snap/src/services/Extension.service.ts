@@ -8,6 +8,8 @@ import {
   EthStateStorage,
   IdentityStorage,
   IdentityWallet,
+  JWSPacker,
+  KMS,
   PackageManager,
   PlainPacker,
   ProofService,
@@ -40,7 +42,7 @@ export class ExtensionService {
     await CircuitStorageInstance.init();
 
     const accountInfo = await WalletService.createWallet();
-    const { wallet, credWallet, dataStorage } = accountInfo;
+    const { wallet, credWallet, dataStorage, kms } = accountInfo;
 
     const circuitStorage = CircuitStorageInstance.getCircuitStorageInstance();
 
@@ -49,12 +51,14 @@ export class ExtensionService {
       credWallet,
       circuitStorage,
       new EthStateStorage(defaultEthConnectionConfig),
+      { ipfsNodeURL: 'https://ipfs.io' },
     );
 
     const packageMgr = await ExtensionService.getPackageMgr(
       await circuitStorage.loadCircuitData(CircuitId.AuthV2),
       proofService.generateAuthV2Inputs.bind(proofService),
       proofService.verifyState.bind(proofService),
+      kms,
     );
 
     const authHandler = new AuthHandler(packageMgr, proofService, credWallet);
@@ -99,6 +103,7 @@ export class ExtensionService {
       (circuitId: string, pubSignals: string[]): Promise<boolean>;
       (id: string, pubSignals: string[]): Promise<boolean>;
     },
+    kms: KMS,
   ) {
     const authInputsHandler = new DataPrepareHandlerFunc(prepareFn);
     const verificationFn = new VerificationHandlerFunc(stateVerificationFn);
@@ -124,7 +129,8 @@ export class ExtensionService {
     const mgr = new PackageManager();
     const packer = new ZKPPacker(provingParamMap, verificationParamMap);
     const plainPacker = new PlainPacker();
-    mgr.registerPackers([packer, plainPacker]);
+    const jwsPacker = new JWSPacker(kms);
+    mgr.registerPackers([packer, plainPacker, jwsPacker]);
 
     return mgr;
   }

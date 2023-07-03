@@ -1,17 +1,17 @@
 import {
-  // LocalStoragePrivateKeyStore,
   IdentityStorage,
-  // MerkleTreeLocalStorage,
-  // InMemoryMerkleTreeStorage,
   CredentialStorage,
   BjjProvider,
   KmsKeyType,
   IdentityWallet,
   CredentialWallet,
   KMS,
-  // InMemoryDataSource,
   EthStateStorage,
-  // InMemoryPrivateKeyStore,
+  CredentialStatusResolverRegistry,
+  CredentialStatusType,
+  IssuerResolver,
+  OnChainResolver,
+  RHSResolver,
 } from '@0xpolygonid/js-sdk';
 
 import { defaultEthConnectionConfig } from '../constants';
@@ -38,16 +38,22 @@ export class WalletService {
       // mt: new InMemoryMerkleTreeStorage(40),
       states: new EthStateStorage(defaultEthConnectionConfig),
     };
-    // const dataStorage = {
-    //   credential: new CredentialStorage(new InMemoryDataSource()),
-    //   identity: new IdentityStorage(
-    //     new InMemoryDataSource(),
-    //     new InMemoryDataSource(),
-    //   ),
-    //   mt: new InMemoryMerkleTreeStorage(40),
-    //   states: new EthStateStorage(defaultEthConnectionConfig),
-    // };
-    const credWallet = new CredentialWallet(dataStorage);
+    const resolvers = new CredentialStatusResolverRegistry();
+    resolvers.register(
+      CredentialStatusType.SparseMerkleTreeProof,
+      new IssuerResolver(),
+    );
+
+    resolvers.register(
+      CredentialStatusType.Iden3ReverseSparseMerkleTreeProof,
+      new RHSResolver(dataStorage.states),
+    );
+
+    resolvers.register(
+      CredentialStatusType.Iden3OnchainSparseMerkleTreeProof2023,
+      new OnChainResolver([defaultEthConnectionConfig]),
+    );
+    const credWallet = new CredentialWallet(dataStorage, resolvers);
     const wallet = new IdentityWallet(kms, dataStorage, credWallet);
 
     return {
