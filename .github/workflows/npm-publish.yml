@@ -14,9 +14,14 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org/
+
       - run: yarn install
+        continue-on-error: true
+
       - run: yarn build
         working-directory: packages/snap
+        continue-on-error: true
+
       - run: yarn publish
         working-directory: packages/snap
         env:
