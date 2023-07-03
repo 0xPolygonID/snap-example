@@ -14,15 +14,16 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org/
+          cache: 'yarn'
 
-      - run: yarn install
+      - run: yarn install --frozen-lockfile
         continue-on-error: true
 
       - run: yarn build
         working-directory: packages/snap
         continue-on-error: true
 
-      - run: yarn npm publish
+      - run: yarn publish --access public
         working-directory: packages/snap
         env:
           NODE_AUTH_TOKEN: ${{secrets.POLYGONID_NPM_PUBLISH_TOKEN}}
