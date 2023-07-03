@@ -51,6 +51,7 @@ export class ExtensionService {
       credWallet,
       circuitStorage,
       new EthStateStorage(defaultEthConnectionConfig),
+      { ipfsNodeURL: 'https://ipfs.io' },
     );
 
     const packageMgr = await ExtensionService.getPackageMgr(

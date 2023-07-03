@@ -41,6 +41,6 @@ jobs:
         run: |
           ref="$(echo ${GITHUB_REF} | cut -d'/' -f3)"
           echo GITHUB_REF - $ref
-          docker buildx build -f Dockerfile --build-arg ENVIRONMENT_CONFIG=issuer --push \
+          docker buildx build -f Dockerfile --push \
            --platform linux/amd64 \
            -t ghcr.io/0xPolygonID/snap-demo:${ref} .
