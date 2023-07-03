@@ -1,15 +1,15 @@
 {
   "name": "@metamask/template-snap-monorepo",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "description": "",
-  "homepage": "https://github.com/MetaMask/template-snap-monorepo#readme",
+  "homepage": "https://github.com/0xPolygonID/snap-example#readme",
   "bugs": {
-    "url": "https://github.com/MetaMask/template-snap-monorepo/issues"
+    "url": "https://github.com/0xPolygonID/snap-example/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "git+https://github.com/0xPolygonID/snap-example.git"
   },
   "license": "(MIT-0 OR Apache-2.0)",
   "author": "",
