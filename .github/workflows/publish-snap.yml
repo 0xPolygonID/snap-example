@@ -47,4 +47,4 @@ jobs:
           echo GITHUB_REF - $ref
           docker buildx build -f Dockerfile --push \
            --platform linux/amd64 \
-           -t ghcr.io/0xPolygonID/snap-demo:${ref} .
+           -t ghcr.io/0xpolygonid/snap-example:${ref} .
