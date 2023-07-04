@@ -23,7 +23,7 @@ jobs:
         working-directory: packages/snap
         continue-on-error: true
 
-      - run: yarn npm publish
+      - run: npm publish
         working-directory: packages/snap
         env:
           NODE_AUTH_TOKEN: ${{secrets.POLYGONID_NPM_PUBLISH_TOKEN}}

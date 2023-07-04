@@ -44,7 +44,6 @@ export class SnapMerkleTreeLocalStorage implements IMerkleTreeStorage {
     );
     if (meta) {
       // eslint-disable-next-line no-debugger
-      debugger;
       const metaInfo: IdentityMerkleTreeMetaInformation[] = JSON.parse(meta);
       const identityMetaInfo = metaInfo.filter(
         (m) => m.identifier === identifier,

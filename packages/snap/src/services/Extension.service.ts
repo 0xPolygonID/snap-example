@@ -39,7 +39,6 @@ export class ExtensionService {
   };
 
   static async init() {
-    debugger;
     await CircuitStorageInstance.init();
 
     const accountInfo = await WalletService.createWallet();

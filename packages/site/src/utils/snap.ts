@@ -81,8 +81,8 @@ export const clearStore = async () => {
   });
 };
 
-export const handleRequest = async (request: string) => {
-  console.log('site:handleRequest', request);
+export const handleRequest = async (requestBase64: string) => {
+  console.log('site:handleRequest', requestBase64);
   return await window.ethereum.request({
     method: `wallet_invokeSnap`,
     params: {
@@ -90,7 +90,7 @@ export const handleRequest = async (request: string) => {
       request: {
         method: 'handleRequest',
         params: {
-          msg: request,
+          msg: requestBase64,
         },
       },
     },
@@ -112,10 +112,10 @@ export const getListCredentialRequest = async () => {
 
 export const signMessage = async (authRequestToSignBase64: string) => {
   try {
-    const permissions: any[] = await window.ethereum.request({
+    const permissions: any[] = (await window.ethereum.request({
       method: 'wallet_requestPermissions',
       params: [{ eth_accounts: {} }],
-    }) as any[]; 
+    })) as any[];
     console.log('permissions', permissions);
 
     const accountsPermission = permissions.find(

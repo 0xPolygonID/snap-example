@@ -6,20 +6,15 @@ import {
   getSnap,
   getStore,
   clearStore,
-  handleRequest,
   getListCredentialRequest,
-  sendHello,
   shouldDisplayReconnectButton,
-  signMessage,
 } from '../utils';
 import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton,
   Card,
   TextButton,
-  Footer,
 } from '../components';
 
 const Container = styled.div`
@@ -69,25 +64,6 @@ const CardContainer = styled.div`
   margin-top: 1.5rem;
 `;
 
-const Notice = styled.div`
-  background-color: ${({ theme }) => theme.colors.background.alternative};
-  border: 1px solid ${({ theme }) => theme.colors.border.default};
-  color: ${({ theme }) => theme.colors.text.alternative};
-  border-radius: ${({ theme }) => theme.radii.default};
-  padding: 2.4rem;
-  margin-top: 2.4rem;
-  max-width: 60rem;
-  width: 100%;
-
-  & > * {
-    margin: 0;
-  }
-  ${({ theme }) => theme.mediaQueries.small} {
-    margin-top: 1.2rem;
-    padding: 1.6rem;
-  }
-`;
-
 const ErrorMessage = styled.div`
   background-color: ${({ theme }) => theme.colors.error.muted};
   border: 1px solid ${({ theme }) => theme.colors.error.default};
@@ -108,24 +84,9 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
-  const [requestBase64, setRequestBase64] = useState(
+  const [requestBase64] = useState(
     'eyJpZCI6ImZiN2FkNWQyLTViNTAtNDVkYS04YjgwLTczMTcxZTIxN2Y3NCIsInR5cCI6ImFwcGxpY2F0aW9uL2lkZW4zY29tbS1wbGFpbi1qc29uIiwidHlwZSI6Imh0dHBzOi8vaWRlbjMtY29tbXVuaWNhdGlvbi5pby9hdXRob3JpemF0aW9uLzEuMC9yZXF1ZXN0IiwidGhpZCI6ImZiN2FkNWQyLTViNTAtNDVkYS04YjgwLTczMTcxZTIxN2Y3NCIsImJvZHkiOnsiY2FsbGJhY2tVcmwiOiJodHRwczovL2lzc3Vlci12Mi5wb2x5Z29uaWQubWUvYXBpL2NhbGxiYWNrP3Nlc3Npb25JZD05NDY3NjIiLCJyZWFzb24iOiJ0ZXN0IGZsb3ciLCJzY29wZSI6W119LCJmcm9tIjoiZGlkOnBvbHlnb25pZDpwb2x5Z29uOm11bWJhaToycUo2ODlrcG9KeGNTekI1c0FGSnRQc1NCU3JIRjVkcTcyMkJITXFVUkwifQ==',
   );
-
-  const [authRequestToSignBase64, setAuthRequestToSignBase64] = useState(
-    'eyJpZCI6ImZiN2FkNWQyLTViNTAtNDVkYS04YjgwLTczMTcxZTIxN2Y3NCIsInR5cCI6ImFwcGxpY2F0aW9uL2lkZW4zY29tbS1wbGFpbi1qc29uIiwidHlwZSI6Imh0dHBzOi8vaWRlbjMtY29tbXVuaWNhdGlvbi5pby9hdXRob3JpemF0aW9uLzEuMC9yZXF1ZXN0IiwidGhpZCI6ImZiN2FkNWQyLTViNTAtNDVkYS04YjgwLTczMTcxZTIxN2Y3NCIsImJvZHkiOnsiY2FsbGJhY2tVcmwiOiJodHRwczovL2lzc3Vlci12Mi5wb2x5Z29uaWQubWUvYXBpL2NhbGxiYWNrP3Nlc3Npb25JZD05NDY3NjIiLCJyZWFzb24iOiJ0ZXN0IGZsb3ciLCJzY29wZSI6W119LCJmcm9tIjoiZGlkOnBvbHlnb25pZDpwb2x5Z29uOm11bWJhaToycUo2ODlrcG9KeGNTekI1c0FGSnRQc1NCU3JIRjVkcTcyMkJITXFVUkwifQ==',
-  );
-
-  const handleSendRequestClick = async () => {
-    try {
-      // setCurrentChainId(await getCurrentNetwork());
-      const result = await handleRequest(requestBase64);
-      console.log(result);
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
 
   const handleConnectClick = async () => {
     try {
@@ -136,15 +97,6 @@ const Index = () => {
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
       });
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleSendHelloClick = async () => {
-    try {
-      await sendHello();
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -181,30 +133,16 @@ const Index = () => {
     }
   };
 
-  const handleMsgSign = async () => {
-    console.log('handleMsgSign');
-    try {
-      console.log(authRequestToSignBase64);
-
-      const res = await signMessage(authRequestToSignBase64);
-      console.log(res);
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
   return (
     <Container>
       <Heading>
-         <Span> Polygon ID Snap</Span>
+        <Span> Polygon ID Snap</Span>
       </Heading>
       <Subtitle>
-        Demo of zero knowledge proof sharing for Verifiable Credentials and did:pkh
+        Demo of zero knowledge proof sharing for Verifiable Credentials and
+        did:pkh
       </Subtitle>
-      <Subtitle>
-        using iden3comm protocol and metamask snaps
-      </Subtitle>
+      <Subtitle>using iden3comm protocol and metamask snaps</Subtitle>
 
       <CardContainer>
         {state.error && (
@@ -235,7 +173,6 @@ const Index = () => {
                   disabled={!state.isFlask}
                 />
               ),
-
             }}
             fullWidth
             disabled={!state.isFlask}
@@ -257,29 +194,26 @@ const Index = () => {
             disabled={!state.installedSnap}
           />
         )}
-       
 
+        <TextButton
+          text={'get list creds'}
+          onClick={handleListCredential}
+          disabled={!state.installedSnap}
+        />
+        <br />
+        <TextButton
+          text={'get Store'}
+          onClick={handleGetStore}
+          disabled={!state.installedSnap}
+        />
+        <br />
 
-      <TextButton
-                text={'get list creds'}
-                onClick={handleListCredential}
-                disabled={!state.installedSnap}
-              />
-              <br />
-      <TextButton
-                text={'get Store'}
-                onClick={handleGetStore}
-                disabled={!state.installedSnap}
-              />
-              <br />
-              
-              <TextButton
-                text={'clear Store'}
-                onClick={handleClearStore}
-                disabled={!state.installedSnap}
-              />
-      
- 
+        <TextButton
+          text={'clear Store'}
+          onClick={handleClearStore}
+          disabled={!state.installedSnap}
+        />
+
         {/* <Card
           content={{
             title: 'Send request',
@@ -313,7 +247,7 @@ const Index = () => {
             Boolean(state.installedSnap) &&
             !shouldDisplayReconnectButton(state.installedSnap)
           } /> */}
-       
+
         {/* <Notice>
           <p>
             Please note that the <b>snap.manifest.json</b> and{' '}

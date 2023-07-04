@@ -3,7 +3,6 @@
 import './polyfill-intl';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, text, panel, heading, copyable } from '@metamask/snaps-ui';
-byteDecoder
 import {
   W3CCredential,
   base64ToBytes,
@@ -102,13 +101,18 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'handleRequest': {
       try {
         const message = (request.params as any).msg;
+        const messageObjStr = JSON.stringify(
+          JSON.parse(byteDecoder.decode(base64ToBytes(message))),
+          null,
+          2,
+        );
         const result = await snap.request({
           method: 'snap_dialog',
           params: {
             type: 'confirmation',
             content: panel([
-              heading('Do you want to sign this message? '),
-              copyable(message),
+              heading('Authorization is requested'),
+              copyable(messageObjStr),
             ]),
           },
         });

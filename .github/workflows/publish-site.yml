@@ -1,4 +1,4 @@
-name: publish snap ui site
+name: publish site
 
 on:
   workflow_dispatch:

@@ -4,7 +4,7 @@
  * @returns True if the MetaMask version is Flask, false otherwise.
  */
 export const isFlask = async () => {
-  debugger;
+
   const provider = window.ethereum;
 
   try {

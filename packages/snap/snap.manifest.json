@@ -1,13 +1,13 @@
 {
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "PolygonID MetaMask snap example",
-  "proposedName": "TypeScript Example Snap",
+  "proposedName": "PolygonID MetaMask snap example",
   "repository": {
     "type": "git",
     "url": "https://github.com/0xPolygonID/snap-example.git"
   },
   "source": {
-    "shasum": "Faie9jxiaVvntL92yGfTIV3jwlRVLAlyRZH7hqU/uRY=",
+    "shasum": "7W7G3mfY7Kdixg7acpJ7drnTja94r29DCzfF8dB8OrE=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
