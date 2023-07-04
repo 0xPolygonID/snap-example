@@ -1,7 +1,7 @@
 {
   "name": "@0xpolygonid/snap-example",
-  "version": "1.0.0-beta.0",
-  "description": "PolygonID MetaMask Snaps example, written in TypeScript.",
+  "version": "1.0.0-beta.1",
+  "description": "PolygonID MetaMask Snap example",
   "repository": {
     "type": "git",
     "url": "https://github.com/0xPolygonID/snap-example.git"

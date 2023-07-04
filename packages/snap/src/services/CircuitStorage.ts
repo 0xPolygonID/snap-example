@@ -1,70 +1,61 @@
 import {
+  CircuitData,
   CircuitId,
   CircuitStorage,
   InMemoryDataSource,
+  base64ToBytes,
+  byteEncoder,
 } from '@0xpolygonid/js-sdk';
-import { CIRCUITS_FETCH_PATH } from '../../../site/src/config/snap';
+export type b64File = {
+  b64:string
+}
+import sigZ from '../circuits/credentialAtomicQuerySigV2/circuit_final.zkey.json'
+import sigW from '../circuits/credentialAtomicQuerySigV2/circuit.wasm.json'
+import sigV from '../circuits/credentialAtomicQuerySigV2/verification_key.json'
 
-const load = (path: string) => {
-  return fetch(`${CIRCUITS_FETCH_PATH}${path}`);
-};
+import mtpZ from '../circuits/credentialAtomicQueryMTPV2/circuit_final.zkey.json'
+import mtpW from '../circuits/credentialAtomicQueryMTPV2/circuit.wasm.json'
+import mtpV from '../circuits/credentialAtomicQueryMTPV2/verification_key.json'
+
+import authZ from '../circuits/authV2/circuit_final.zkey.json'
+import authW from '../circuits/authV2/circuit.wasm.json'
+import authV from '../circuits/authV2/verification_key.json'
+
 export class CircuitStorageInstance {
   static instanceCS: CircuitStorage;
 
   static async init() {
-    const authW = await load('/authV2/circuit.wasm')
-      .then((response) => response.arrayBuffer())
-      .then((buffer) => new Uint8Array(buffer));
-    const mtpW = await load('/credentialAtomicQueryMTPV2/circuit.wasm')
-      .then((response) => response.arrayBuffer())
-      .then((buffer) => new Uint8Array(buffer));
-    const sigW = await load('/credentialAtomicQuerySigV2/circuit.wasm')
-      .then((response) => response.arrayBuffer())
-      .then((buffer) => new Uint8Array(buffer));
-
-    const authZ = await load('/authV2/circuit_final.zkey')
-      .then((response) => response.arrayBuffer())
-      .then((buffer) => new Uint8Array(buffer));
-    const mtpZ = await load('/credentialAtomicQueryMTPV2/circuit_final.zkey')
-      .then((response) => response.arrayBuffer())
-      .then((buffer) => new Uint8Array(buffer));
-    const sigZ = await load('/credentialAtomicQuerySigV2/circuit_final.zkey')
-      .then((response) => response.arrayBuffer())
-      .then((buffer) => new Uint8Array(buffer));
-
-    const authJ = await load('/authV2/verification_key.json')
-      .then((response) => response.arrayBuffer())
-      .then((buffer) => new Uint8Array(buffer));
-    const mtpJ = await load('/credentialAtomicQueryMTPV2/verification_key.json')
-      .then((response) => response.arrayBuffer())
-      .then((buffer) => new Uint8Array(buffer));
-    const sigJ = await load('/credentialAtomicQuerySigV2/verification_key.json')
-      .then((response) => response.arrayBuffer())
-      .then((buffer) => new Uint8Array(buffer));
 
     if (!this.instanceCS) {
-      this.instanceCS = new CircuitStorage(new InMemoryDataSource());
-      await this.instanceCS.saveCircuitData(CircuitId.AuthV2, {
-        circuitId: 'authV2',
-        wasm: authW,
-        provingKey: authZ,
-        verificationKey: authJ,
-      });
-
-      await this.instanceCS.saveCircuitData(CircuitId.AtomicQueryMTPV2, {
-        circuitId: 'credentialAtomicQueryMTPV2',
-        wasm: mtpW,
-        provingKey: mtpZ,
-        verificationKey: mtpJ,
-      });
+      debugger;
+      this.instanceCS = new CircuitStorage(new InMemoryDataSource<CircuitData>());
+    }
+    try {
+        await this.instanceCS.loadCircuitData(CircuitId.AtomicQuerySigV2);
+    }
+    catch{
 
       await this.instanceCS.saveCircuitData(CircuitId.AtomicQuerySigV2, {
         circuitId: 'credentialAtomicQuerySigV2',
-        wasm: sigW,
-        provingKey: sigZ,
-        verificationKey: sigJ,
+        wasm: base64ToBytes((sigW as b64File).b64),
+        provingKey: base64ToBytes((sigZ as b64File).b64),
+        verificationKey: byteEncoder.encode(JSON.stringify(sigV)),
+      });
+      await this.instanceCS.saveCircuitData(CircuitId.AuthV2, {
+        circuitId: 'authV2',
+        wasm: base64ToBytes((authW as b64File).b64),
+        provingKey: base64ToBytes((authZ as b64File).b64),
+        verificationKey: byteEncoder.encode(JSON.stringify(authV)),
+      });
+      await this.instanceCS.saveCircuitData(CircuitId.AtomicQueryMTPV2, {
+        circuitId: 'credentialAtomicQueryMTPV2',
+        wasm: base64ToBytes((mtpW as b64File).b64),
+        provingKey: base64ToBytes((mtpZ as b64File).b64),
+        verificationKey: byteEncoder.encode(JSON.stringify(mtpV)),
       });
     }
+
+  
     console.log(this.instanceCS);
   }
 

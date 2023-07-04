@@ -3,7 +3,7 @@
 import './polyfill-intl';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, text, panel, heading, copyable } from '@metamask/snaps-ui';
-
+byteDecoder
 import {
   W3CCredential,
   base64ToBytes,
@@ -11,6 +11,7 @@ import {
   PROTOCOL_CONSTANTS,
   hexToBytes,
   FetchHandler,
+  byteDecoder,
 } from '@0xpolygonid/js-sdk';
 
 import { Wallet } from 'ethers';

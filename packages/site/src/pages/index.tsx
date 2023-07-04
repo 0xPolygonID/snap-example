@@ -19,6 +19,7 @@ import {
   SendHelloButton,
   Card,
   TextButton,
+  Footer,
 } from '../components';
 
 const Container = styled.div`
@@ -196,11 +197,15 @@ const Index = () => {
   return (
     <Container>
       <Heading>
-        Welcome to <Span>template-snap</Span>
+         <Span> Polygon ID Snap</Span>
       </Heading>
       <Subtitle>
-        Get started by editing <code>src/index.ts</code>
+        Demo of zero knowledge proof sharing for Verifiable Credentials and did:pkh
       </Subtitle>
+      <Subtitle>
+        using iden3comm protocol and metamask snaps
+      </Subtitle>
+
       <CardContainer>
         {state.error && (
           <ErrorMessage>
@@ -223,14 +228,16 @@ const Index = () => {
             content={{
               title: 'Connect',
               description:
-                'Get started by connecting to and installing the example snap.',
+                'Get started by connecting to and installing the Polygon ID snap. (DO NOT USE IN PRODUCTION)',
               button: (
                 <ConnectButton
                   onClick={handleConnectClick}
                   disabled={!state.isFlask}
                 />
               ),
+
             }}
+            fullWidth
             disabled={!state.isFlask}
           />
         )}
@@ -250,116 +257,30 @@ const Index = () => {
             disabled={!state.installedSnap}
           />
         )}
-        <Card
-          content={{
-            title: 'Send Hello message',
-            description:
-              'Display a custom message within a confirmation screen in MetaMask.',
-            button: (
-              <SendHelloButton
-                onClick={handleSendHelloClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'get list creds',
-            description: 'get list creds',
-            button: (
-              <TextButton
+       
+
+
+      <TextButton
                 text={'get list creds'}
                 onClick={handleListCredential}
                 disabled={!state.installedSnap}
               />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'Handle message sign',
-            description: 'Handle message sign',
-            button: (
-              <TextButton
-                text={'Handle sign'}
-                onClick={handleMsgSign}
-                disabled={!state.installedSnap}
-              />
-            ),
-            form: (
-              <form>
-                <label>
-                  Enter request
-                  <textarea
-                    rows={15}
-                    style={{ width: '100%' }}
-                    value={authRequestToSignBase64}
-                    onChange={(e) => setAuthRequestToSignBase64(e.target.value)}
-                  />
-                </label>
-                <br />
-              </form>
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'get store',
-            description: 'get store',
-            button: (
-              <TextButton
+              <br />
+      <TextButton
                 text={'get Store'}
                 onClick={handleGetStore}
                 disabled={!state.installedSnap}
               />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'clear store',
-            description: 'clear store',
-            button: (
+              <br />
+              
               <TextButton
                 text={'clear Store'}
                 onClick={handleClearStore}
                 disabled={!state.installedSnap}
               />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
+      
+ 
+        {/* <Card
           content={{
             title: 'Send request',
             description: 'base 64',
@@ -391,16 +312,16 @@ const Index = () => {
             state.isFlask &&
             Boolean(state.installedSnap) &&
             !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Notice>
+          } /> */}
+       
+        {/* <Notice>
           <p>
             Please note that the <b>snap.manifest.json</b> and{' '}
             <b>package.json</b> must be located in the server root directory and
             the bundle must be hosted at the location specified by the location
             field.
           </p>
-        </Notice>
+        </Notice> */}
       </CardContainer>
     </Container>
   );

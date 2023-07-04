@@ -90,7 +90,7 @@ export const handleRequest = async (request: string) => {
       request: {
         method: 'handleRequest',
         params: {
-          request,
+          msg: request,
         },
       },
     },
@@ -115,7 +115,7 @@ export const signMessage = async (authRequestToSignBase64: string) => {
     const permissions: any[] = await window.ethereum.request({
       method: 'wallet_requestPermissions',
       params: [{ eth_accounts: {} }],
-    });
+    }) as any[]; 
     console.log('permissions', permissions);
 
     const accountsPermission = permissions.find(
