@@ -1,7 +1,6 @@
 {
   "name": "@metamask/template-snap-monorepo",
   "version": "0.1.0",
-  "private": false,
   "description": "",
   "homepage": "https://github.com/0xPolygonID/snap-example#readme",
   "bugs": {
