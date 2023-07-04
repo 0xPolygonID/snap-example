@@ -36,8 +36,7 @@
     "buffer": "^6.0.3",
     "did-jwt": "^6.11.6",
     "ethers": "^6.4.0",
-    "intl": "^1.2.5",
-    "rdf-canonize-native": "^1.1.2"
+    "intl": "^1.2.5"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^2.0.3",
