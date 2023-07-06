@@ -38,6 +38,8 @@ const Button = styled.button`
   align-items: center;
   justify-content: center;
   margin-top: auto;
+  margin-bottom: 16px;
+  min-width: 124px;
   ${({ theme }) => theme.mediaQueries.small} {
     width: 100%;
   }

@@ -83,6 +83,18 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return credentials;
     }
 
+    case 'get_identity': {
+      await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'alert',
+          content: panel([heading('Your DID'), copyable(didStr)]),
+        },
+      });
+
+      break;
+    }
+
     case 'get_store': {
       return await snap.request({
         method: 'snap_manageState',

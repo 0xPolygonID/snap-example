@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
@@ -8,6 +8,7 @@ import {
   clearStore,
   getListCredentialRequest,
   shouldDisplayReconnectButton,
+  handleIdentityRequest,
 } from '../utils';
 import {
   ConnectButton,
@@ -84,9 +85,6 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
-  const [requestBase64] = useState(
-    'eyJpZCI6ImZiN2FkNWQyLTViNTAtNDVkYS04YjgwLTczMTcxZTIxN2Y3NCIsInR5cCI6ImFwcGxpY2F0aW9uL2lkZW4zY29tbS1wbGFpbi1qc29uIiwidHlwZSI6Imh0dHBzOi8vaWRlbjMtY29tbXVuaWNhdGlvbi5pby9hdXRob3JpemF0aW9uLzEuMC9yZXF1ZXN0IiwidGhpZCI6ImZiN2FkNWQyLTViNTAtNDVkYS04YjgwLTczMTcxZTIxN2Y3NCIsImJvZHkiOnsiY2FsbGJhY2tVcmwiOiJodHRwczovL2lzc3Vlci12Mi5wb2x5Z29uaWQubWUvYXBpL2NhbGxiYWNrP3Nlc3Npb25JZD05NDY3NjIiLCJyZWFzb24iOiJ0ZXN0IGZsb3ciLCJzY29wZSI6W119LCJmcm9tIjoiZGlkOnBvbHlnb25pZDpwb2x5Z29uOm11bWJhaToycUo2ODlrcG9KeGNTekI1c0FGSnRQc1NCU3JIRjVkcTcyMkJITXFVUkwifQ==',
-  );
 
   const handleConnectClick = async () => {
     try {
@@ -126,6 +124,16 @@ const Index = () => {
   const handleListCredential = async () => {
     try {
       const res = await getListCredentialRequest();
+      console.log(res);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleIdentity = async () => {
+    try {
+      const res = await handleIdentityRequest();
       console.log(res);
     } catch (e) {
       console.error(e);
@@ -194,22 +202,26 @@ const Index = () => {
             disabled={!state.installedSnap}
           />
         )}
+      </CardContainer>
 
+      <CardContainer>
         <TextButton
-          text={'get list creds'}
+          text={'Identity'}
+          onClick={handleIdentity}
+          disabled={!state.installedSnap}
+        />
+        <TextButton
+          text={'Creadential list'}
           onClick={handleListCredential}
           disabled={!state.installedSnap}
         />
-        <br />
         <TextButton
-          text={'get Store'}
+          text={'Show Store'}
           onClick={handleGetStore}
           disabled={!state.installedSnap}
         />
-        <br />
-
         <TextButton
-          text={'clear Store'}
+          text={'Clear Store'}
           onClick={handleClearStore}
           disabled={!state.installedSnap}
         />
