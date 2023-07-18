@@ -21,6 +21,7 @@ import { defaultEthConnectionConfig, INIT } from '../constants';
 import { SnapMerkleTreeLocalStorage } from '../storage/snap-merkletree-store';
 import { CircuitStorageInstance } from './CircuitStorage';
 import { WalletService } from './Wallet.service';
+import { DIDResolutionOptions, DIDResolutionResult } from 'did-resolver';
 
 export class ExtensionService {
   static instanceES: {
@@ -129,7 +130,25 @@ export class ExtensionService {
     const mgr = new PackageManager();
     const packer = new ZKPPacker(provingParamMap, verificationParamMap);
     const plainPacker = new PlainPacker();
-    const jwsPacker = new JWSPacker(kms);
+    const resolveDIDDocument = async (
+      didUrl: string,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      options?: DIDResolutionOptions,
+    ): Promise<DIDResolutionResult> => {
+      try {
+        const response = await fetch(
+          `https://dev.uniresolver.io/1.0/identifiers/${didUrl}`,
+        );
+        const data = await response.json();
+        return data as DIDResolutionResult;
+      } catch (error: unknown) {
+        throw new Error(
+          `Can't resolve did document: ${(error as Error).message}`,
+        );
+      }
+    };
+
+    const jwsPacker = new JWSPacker(kms, { resolve: resolveDIDDocument });
     mgr.registerPackers([packer, plainPacker, jwsPacker]);
 
     return mgr;
