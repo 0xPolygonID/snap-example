@@ -1,6 +1,6 @@
 {
   "name": "@0xpolygonid/snap-example",
-  "version": "1.0.0-beta.7",
+  "version": "1.0.0-beta.8",
   "description": "PolygonID MetaMask Snap example",
   "repository": {
     "type": "git",
@@ -27,7 +27,7 @@
     "start": "mm-snap --version && yarn build && yarn serve"
   },
   "dependencies": {
-    "@0xpolygonid/js-sdk": "https://github.com/0xPolygonID/js-sdk#fff6dd9bfcd599a56880b717b3aab49152329b58",
+    "@0xpolygonid/js-sdk": "https://github.com/0xPolygonID/js-sdk#v2",
     "@iden3/js-iden3-core": "https://github.com/iden3/js-iden3-core#v2",
     "@iden3/js-jwz": "^1.0.0-beta.2",
     "@iden3/js-merkletree": "^1.0.0-beta.4",
