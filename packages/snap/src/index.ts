@@ -11,6 +11,7 @@ import {
   hexToBytes,
   FetchHandler,
   byteDecoder,
+  JWSPackerParams,
 } from '@0xpolygonid/js-sdk';
 
 import { Wallet } from 'ethers';
@@ -40,12 +41,18 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
   const ethWallet = new Wallet(privKey);
 
+  const { dataStorage } = ExtensionService.getExtensionServiceInstance();
+
   const did = core.DID.parse(`did:pkh:poly:${ethWallet.address}`);
   const didStr = did.string();
 
-  const jwsPackerOpts = {
-    mediaType: PROTOCOL_CONSTANTS.MediaType.SignedMessage,
-    did: didStr,
+  if (!(await dataStorage.identity.getIdentity(didStr))) {
+    await dataStorage.identity.saveIdentity({
+      did: didStr,
+    });
+  }
+
+  const jwsPackerOpts: JWSPackerParams = {
     alg: 'ES256K-R',
     signer: (_: any, msg: any) => {
       return async () => {
@@ -137,10 +144,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         const { authHandler } = ExtensionService.getExtensionServiceInstance();
         console.log(didStr);
         const { token, authRequest } =
-          await authHandler.handleAuthorizationRequestForGenesisDID({
-            did,
-            request: msgBts,
-            packer: jwsPackerOpts,
+          await authHandler.handleAuthorizationRequest(did, msgBts, {
+            mediaType: PROTOCOL_CONSTANTS.MediaType.SignedMessage,
+            packerOptions: jwsPackerOpts,
           });
         console.log(token);
 
@@ -168,10 +174,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         const { msg } = request.params as any;
         const msgBytes = base64ToBytes(msg);
 
-        const credentials = await fetchHandler.handleCredentialOffer({
-          did,
-          offer: msgBytes,
-          packer: jwsPackerOpts,
+        const credentials = await fetchHandler.handleCredentialOffer(msgBytes, {
+          mediaType: PROTOCOL_CONSTANTS.MediaType.SignedMessage,
+          packerOptions: jwsPackerOpts,
         });
         console.log('finish fetching credentials', credentials);
 
