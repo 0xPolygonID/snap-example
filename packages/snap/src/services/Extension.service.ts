@@ -52,7 +52,7 @@ export class ExtensionService {
       credWallet,
       circuitStorage,
       new EthStateStorage(defaultEthConnectionConfig),
-      { ipfsNodeURL: 'https://ipfs.io' },
+      { ipfsGatewayURL: 'https://ipfs.io' },
     );
 
     const packageMgr = await ExtensionService.getPackageMgr(
@@ -62,7 +62,7 @@ export class ExtensionService {
       kms,
     );
 
-    const authHandler = new AuthHandler(packageMgr, proofService, credWallet);
+    const authHandler = new AuthHandler(packageMgr, proofService);
 
     if (!this.instanceES) {
       this.instanceES = {
@@ -87,18 +87,8 @@ export class ExtensionService {
       provingKey: any;
     },
     prepareFn: {
-      (
-        hash: Uint8Array,
-        did: DID,
-        profileNonce: number,
-        circuitId: CircuitId,
-      ): Promise<Uint8Array>;
-      (
-        hash: Uint8Array,
-        did: DID,
-        profileNonce: number,
-        circuitId: CircuitId,
-      ): Promise<Uint8Array>;
+      (hash: Uint8Array, did: DID, circuitId: CircuitId): Promise<Uint8Array>;
+      (hash: Uint8Array, did: DID, circuitId: CircuitId): Promise<Uint8Array>;
     },
     stateVerificationFn: {
       (circuitId: string, pubSignals: string[]): Promise<boolean>;

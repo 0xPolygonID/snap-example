@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.8",
+  "version": "1.0.0-beta.9",
   "description": "PolygonID MetaMask snap example",
   "proposedName": "PolygonID MetaMask snap example",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/0xPolygonID/snap-example.git"
   },
   "source": {
-    "shasum": "UvIAXdHZnWo0VzLG4Sx7+ELXUyI6Nwy7QSUUbT3p518=",
+    "shasum": "ulOe0rJbgLSLAPHFBfuXk0VTdHK9EfwVeB4akROhkaA=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
