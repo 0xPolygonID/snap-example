@@ -27,10 +27,10 @@
     "start": "mm-snap --version && yarn build && yarn serve"
   },
   "dependencies": {
-    "@0xpolygonid/js-sdk": "https://github.com/0xPolygonID/js-sdk#v2",
+    "@0xpolygonid/js-sdk": "1.0.0",
     "@iden3/js-iden3-core": "1.0.0",
-    "@iden3/js-jwz": "^1.0.0-beta.2",
-    "@iden3/js-merkletree": "^1.0.0-beta.4",
+    "@iden3/js-jwz": "1.0.0",
+    "@iden3/js-merkletree": "1.0.0",
     "@metamask/snaps-types": "^0.32.2",
     "@metamask/snaps-ui": "^0.32.2",
     "buffer": "^6.0.3",
