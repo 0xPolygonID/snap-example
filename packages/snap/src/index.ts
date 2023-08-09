@@ -67,6 +67,23 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
   console.log(didStr);
 
+  const getMsgBytes = async (iden3Msg: string): Promise<Uint8Array> => {
+    const messageComm: string = (request.params as any).msg;
+    let msgBts: Uint8Array
+    if (messageComm.includes('?i_m=')) {
+      msgBts = base64ToBytes(messageComm.split('?i_m=')[1]);
+    } else {
+      const url = decodeURIComponent(messageComm.split('?request_uri=')[1]);
+      msgBts = await fetch(url)
+        .then(
+          (res) => res.arrayBuffer()
+        ).then(
+          (res) => new Uint8Array(res)
+        );
+    };
+    return msgBts
+  }
+
   switch (request.method) {
     case 'get_list_creds': {
       const { credWallet } = ExtensionService.getExtensionServiceInstance();
@@ -119,12 +136,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     case 'handleRequest': {
       try {
-        const message = (request.params as any).msg;
-        const messageObjStr = JSON.stringify(
-          JSON.parse(byteDecoder.decode(base64ToBytes(message))),
-          null,
-          2,
-        );
+        const msgBts = await getMsgBytes(request.params.msg);
+
+        const messageObjStr = JSON.stringify(JSON.parse(byteDecoder.decode(msgBts)), null, 2);
+
         const result = await snap.request({
           method: 'snap_dialog',
           params: {
@@ -140,7 +155,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           throw new Error('User rejected request');
         }
 
-        const msgBts = base64ToBytes(message);
         const { authHandler } = ExtensionService.getExtensionServiceInstance();
         console.log(didStr);
         const { token, authRequest } =
@@ -171,10 +185,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           ExtensionService.getExtensionServiceInstance();
         console.log('fetching credentials...');
         const fetchHandler = new FetchHandler(packageMgr);
-        const { msg } = request.params as any;
-        const msgBytes = base64ToBytes(msg);
-
-        const credentials = await fetchHandler.handleCredentialOffer(msgBytes, {
+        const msgBts = await getMsgBytes(request.params.msg);
+        const credentials = await fetchHandler.handleCredentialOffer(msgBts, {
           mediaType: PROTOCOL_CONSTANTS.MediaType.SignedMessage,
           packerOptions: jwsPackerOpts,
         });

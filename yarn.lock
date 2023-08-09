@@ -5,9 +5,9 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@0xpolygonid/js-sdk@npm:1.0.0":
-  version: 1.0.0
-  resolution: "@0xpolygonid/js-sdk@npm:1.0.0"
+"@0xpolygonid/js-sdk@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@0xpolygonid/js-sdk@npm:1.0.2"
   dependencies:
     "@iden3/js-crypto": 1.0.0
     "@iden3/js-iden3-core": 1.0.0
@@ -32,7 +32,7 @@ __metadata:
     snarkjs: ^0.5.0
     uint8arrays: ^3.0.0
     uuid: ^9.0.0
-  checksum: eb7f1a346ffa9a2d6eaa61f1724a282d50917ca9e4397c0b6c643dc9edd3f53267710c3094d26e755a6dd24569a665a33c2fd4ff41eabb172bb6f59e6d791c76
+  checksum: 73944160088b1fe4275eaffa1d1245a1cffca1f1c8a0b84ecbb97768bad9ae9be6a26ad2817233e929660d622c75de6a322c546a53a3189739a266129285cfe4
   languageName: node
   linkType: hard
 
@@ -40,7 +40,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@0xpolygonid/snap-example@workspace:packages/snap"
   dependencies:
-    "@0xpolygonid/js-sdk": 1.0.0
+    "@0xpolygonid/js-sdk": 1.0.2
     "@iden3/js-iden3-core": 1.0.0
     "@iden3/js-jwz": 1.0.0
     "@iden3/js-merkletree": 1.0.0
