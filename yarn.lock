@@ -1749,10 +1749,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@endo/env-options@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "@endo/env-options@npm:0.1.1"
-  checksum: c721db3e2d3f9a52a5c391dc8e6d473ffc44cf2bb252fad3048551e35aac52484d612753211116ff9a7157a0768d7c61352c494f491e3463e78fef438beb1d42
+"@endo/env-options@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "@endo/env-options@npm:0.1.3"
+  checksum: da8c66865d4d30b0053a00960657dc36f022975a888f0dd6a2f6bb37b9fe731f45a02a2cf263d93b1a40fcb37b25f8ba7076cb8af9e93fd95f496365d9382930
   languageName: node
   linkType: hard
 
@@ -16976,11 +16976,11 @@ __metadata:
   linkType: hard
 
 "ses@npm:^0.18.1":
-  version: 0.18.5
-  resolution: "ses@npm:0.18.5"
+  version: 0.18.7
+  resolution: "ses@npm:0.18.7"
   dependencies:
-    "@endo/env-options": ^0.1.1
-  checksum: b41faaf28efc97c09b0322de5c12603e015238e4b2cf5195c8fc3f5fb9bc66169dd394c63bcdb30d8fa36a55d03eeda3df64857ab724b2297fb6b60c4f5dc0e2
+    "@endo/env-options": ^0.1.3
+  checksum: 75ac014771d9bc1f747193c6d0f9e7d2d7700a10311ba8d805d9bc78d4c20d4ef40537f0535b1ea6abf06babf67e70f8bd37b2ad68ad54992a0c5ce842181c87
   languageName: node
   linkType: hard
 
