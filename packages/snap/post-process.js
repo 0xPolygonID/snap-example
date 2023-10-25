@@ -12,6 +12,7 @@ bundleString = 'var Worker = {};\n'.concat(bundleString);
 // Remove eval
 bundleString = bundleString.replaceAll(`eval(`, 'evalIn(');
 
+bundleString = bundleString.replaceAll(`import(`, 'importReplaced(');
 // Remove eval
 bundleString = bundleString.replaceAll(`process.browser`, 'true'); // Remove eval
 
