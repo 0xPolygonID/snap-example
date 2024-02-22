@@ -1,10 +1,11 @@
-import { Merkletree, str2Bytes } from '@iden3/js-merkletree';
-import * as uuid from 'uuid';
-import {
+import type {
   IdentityMerkleTreeMetaInformation,
   IMerkleTreeStorage,
-  MerkleTreeType,
 } from '@0xpolygonid/js-sdk';
+import { MerkleTreeType } from '@0xpolygonid/js-sdk';
+import { Merkletree, str2Bytes } from '@iden3/js-merkletree';
+import * as uuid from 'uuid';
+
 import { snapStorage } from '../rpc/store';
 import { SnapMerkletreeStorageDB } from './merkatree-storage';
 

@@ -1,9 +1,11 @@
-import {
+import type {
   ITreeStorage,
-  Hash,
   Bytes,
   // eslint-disable-next-line @typescript-eslint/no-shadow
   Node,
+} from '@iden3/js-merkletree';
+import {
+  Hash,
   bytes2Hex,
   ZERO_HASH,
   NODE_TYPE_EMPTY,
@@ -13,21 +15,21 @@ import {
   NODE_TYPE_LEAF,
   NodeLeaf,
 } from '@iden3/js-merkletree';
+
 import { snapStorage } from '../rpc/store';
 
 export class SnapMerkletreeStorageDB implements ITreeStorage {
   _currentRoot: Hash;
 
-  _prefixHash: string;
+  private readonly hash: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-parameter-properties
-  constructor(private readonly _prefix: Bytes) {
+  constructor(private readonly prefix: Bytes) {
     this._currentRoot = ZERO_HASH;
-    this._prefixHash = bytes2Hex(_prefix);
+    this.hash = bytes2Hex(prefix);
   }
 
   async get(k: Bytes): Promise<Node | undefined> {
-    const kBytes = new Uint8Array([...this._prefix, ...k]);
+    const kBytes = new Uint8Array([...this.prefix, ...k]);
     const key = bytes2Hex(kBytes);
     const val = await snapStorage.getItem(key);
 
@@ -55,22 +57,24 @@ export class SnapMerkletreeStorageDB implements ITreeStorage {
       }
     }
 
-    throw `error: value found for key ${bytes2Hex(kBytes)} is not of type Node`;
+    throw new Error(
+      `error: value found for key ${bytes2Hex(kBytes)} is not of type Node`,
+    );
   }
 
-  async put(k: Bytes, n: Node): Promise<void> {
-    const kBytes = new Uint8Array([...this._prefix, ...k]);
+  async put(k: Bytes, node: Node): Promise<void> {
+    const kBytes = new Uint8Array([...this.prefix, ...k]);
     const key = bytes2Hex(kBytes);
     const toSerialize: Record<string, unknown> = {
-      type: n.type,
+      type: node.type,
     };
-    if (n instanceof NodeMiddle) {
-      toSerialize.childL = Array.from(n.childL.bytes);
-      toSerialize.childR = Array.from(n.childR.bytes);
-    } else if (n instanceof NodeLeaf) {
+    if (node instanceof NodeMiddle) {
+      toSerialize.childL = Array.from(node.childL.bytes);
+      toSerialize.childR = Array.from(node.childR.bytes);
+    } else if (node instanceof NodeLeaf) {
       toSerialize.entry = [
-        Array.from(n.entry[0].bytes),
-        Array.from(n.entry[1].bytes),
+        Array.from(node.entry[0].bytes),
+        Array.from(node.entry[1].bytes),
       ];
     }
     const val = JSON.stringify(toSerialize);
@@ -82,7 +86,7 @@ export class SnapMerkletreeStorageDB implements ITreeStorage {
       return this._currentRoot;
     }
     // const root = await get(this._prefixHash, this._store);
-    const rootStr = await snapStorage.getItem(this._prefixHash);
+    const rootStr = await snapStorage.getItem(this.hash);
     const bytes: number[] = JSON.parse(rootStr);
     // eslint-disable-next-line no-negated-condition
     if (!rootStr) {
@@ -93,11 +97,11 @@ export class SnapMerkletreeStorageDB implements ITreeStorage {
     return this._currentRoot;
   }
 
-  async setRoot(r: Hash): Promise<void> {
-    this._currentRoot = r;
+  async setRoot(root: Hash): Promise<void> {
+    this._currentRoot = root;
     await snapStorage.setItem(
-      bytes2Hex(this._prefix),
-      JSON.stringify(Array.from(r.bytes)),
+      bytes2Hex(this.prefix),
+      JSON.stringify(Array.from(root.bytes)),
     );
   }
 }

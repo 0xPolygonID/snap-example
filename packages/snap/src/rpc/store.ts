@@ -7,9 +7,7 @@ const getAll = async () => {
 
 export const getItem = async (key: string): Promise<any> => {
   const data = await getAll();
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return data ? data[key] || null : null;
+  return data ? data[key] ?? null : null;
 };
 
 export const setItem = async (key: string, inputData: string) => {
