@@ -1,4 +1,4 @@
-import { EthConnectionConfig } from '@0xpolygonid/js-sdk';
+import type { EthConnectionConfig } from '@0xpolygonid/js-sdk';
 
 export const RHS_URL = 'https://rhs-staging.polygonid.me';
 export const RPC_URL =

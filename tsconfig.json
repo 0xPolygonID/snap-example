@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
-    "declaration": true,
+    "esModuleInterop": true,
+    "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
+    "lib": ["ES2020", "DOM"],
     "module": "CommonJS",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "useUnknownInCatchVariables": false,
-
-    "esModuleInterop": true,
-
-    "sourceMap": true,
+    "noEmit": true,
+    "noErrorTruncation": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
     "strict": true,
-    "target": "ES2017"
-  },
-  "exclude": ["**/__snapshots__/**", "**/test/**", "**/*.test.ts"]
+    "target": "es2020",
+    "resolveJsonModule": true
+  }
 }

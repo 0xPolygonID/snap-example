@@ -1,4 +1,5 @@
-import { heading, panel, Panel, spinner } from '@metamask/snaps-ui';
+import { heading, panel, spinner } from '@metamask/snaps-sdk';
+import type { Panel } from '@metamask/snaps-sdk';
 
 export const confirmRpcDialog = async (
   content: Panel,
@@ -12,10 +13,7 @@ export const confirmRpcDialog = async (
     },
   });
 };
-export const alertRpcDialog = async (
-  content: Panel,
-  type: any = 'alert',
-) => {
+export const alertRpcDialog = async (content: Panel, type: any = 'alert') => {
   return snap.request({
     method: 'snap_dialog',
     params: {

@@ -1,52 +1,62 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // eslint-disable-next-line import/no-unassigned-import
 import './polyfill-intl';
-import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { divider, text, panel, heading, copyable } from '@metamask/snaps-ui';
+import type { W3CCredential, JWSPackerParams } from '@0xpolygonid/js-sdk';
 import {
-  W3CCredential,
   base64ToBytes,
   core,
   PROTOCOL_CONSTANTS,
   hexToBytes,
   FetchHandler,
   byteDecoder,
-  JWSPackerParams,
 } from '@0xpolygonid/js-sdk';
-
-import { Wallet } from 'ethers';
+import type { OnRpcRequestHandler } from '@metamask/snaps-sdk';
+import {
+  panel,
+  divider,
+  text,
+  heading,
+  copyable,
+  SnapError,
+} from '@metamask/snaps-sdk';
 import { ES256KSigner } from 'did-jwt';
-import { ExtensionService } from './services/Extension.service';
+import { Wallet } from 'ethers';
+
 import { confirmRpcDialog } from './rpc/methods';
+import { ExtensionService } from './services/Extension.service';
 
 declare let snap: any;
 
 export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
-}: {
-  origin: string;
-  request: any;
-}): Promise<unknown> => {
+}): Promise<any> => {
   console.log('Request:', JSON.stringify(request, null, 4));
   console.log('Origin:', origin);
   console.log(request);
+  console.log('before init');
 
   await ExtensionService.init();
+  console.log('after init');
 
   const privKey = await snap.request({
     method: 'snap_getEntropy',
     params: { version: 1 },
   });
 
+  console.log('Private key: ', privKey);
   const ethWallet = new Wallet(privKey);
 
   const { dataStorage } = ExtensionService.getExtensionServiceInstance();
 
   const did = core.DID.parse(`did:pkh:poly:${ethWallet.address}`);
   const didStr = did.string();
+  console.log('did', didStr);
 
   if (!(await dataStorage.identity.getIdentity(didStr))) {
+    console.log('saving identity');
     await dataStorage.identity.saveIdentity({
       did: didStr,
     });
@@ -54,6 +64,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
   const jwsPackerOpts: JWSPackerParams = {
     alg: 'ES256K-R',
+    // eslint-disable-next-line id-denylist
     signer: (_: any, msg: any) => {
       return async () => {
         const signature = (await ES256KSigner(
@@ -68,21 +79,18 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   console.log(didStr);
 
   const getMsgBytes = async (iden3Msg: string): Promise<Uint8Array> => {
-    const messageComm: string = (request.params as any).msg;
-    let msgBts: Uint8Array
+    const messageComm: string = request!.params!.msg;
+    let msgBts: Uint8Array;
     if (messageComm.includes('?i_m=')) {
-      msgBts = base64ToBytes(messageComm.split('?i_m=')[1]);
+      msgBts = base64ToBytes(messageComm!.split('?i_m=')[1]);
     } else {
-      const url = decodeURIComponent(messageComm.split('?request_uri=')[1]);
+      const url = decodeURIComponent(messageComm!.split('?request_uri=')[1]);
       msgBts = await fetch(url)
-        .then(
-          (res) => res.arrayBuffer()
-        ).then(
-          (res) => new Uint8Array(res)
-        );
-    };
-    return msgBts
-  }
+        .then(async (res) => res.arrayBuffer())
+        .then((res) => new Uint8Array(res));
+    }
+    return msgBts;
+  };
 
   switch (request.method) {
     case 'get_list_creds': {
@@ -91,8 +99,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
       try {
         credentials = await credWallet.list();
-      } catch (e) {
-        console.error(e);
+      } catch (error) {
+        console.error(error);
         /* empty */
       }
 
@@ -136,75 +144,79 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     case 'handleRequest': {
       try {
-        const msgBts = await getMsgBytes(request.params.msg);
+        const msgBts = await getMsgBytes(request!.params!.msg);
+        const protocolMessage = JSON.parse(byteDecoder.decode(msgBts));
 
-        const messageObjStr = JSON.stringify(JSON.parse(byteDecoder.decode(msgBts)), null, 2);
+        switch (protocolMessage.type) {
+          case PROTOCOL_CONSTANTS.PROTOCOL_MESSAGE_TYPE
+            .AUTHORIZATION_REQUEST_MESSAGE_TYPE: {
+            const messageObjStr = JSON.stringify(protocolMessage, null, 2);
 
-        const result = await snap.request({
-          method: 'snap_dialog',
-          params: {
-            type: 'confirmation',
-            content: panel([
-              heading('Authorization is requested'),
-              copyable(messageObjStr),
-            ]),
-          },
-        });
+            const result = await snap.request({
+              method: 'snap_dialog',
+              params: {
+                type: 'confirmation',
+                content: panel([
+                  heading('Authorization is requested'),
+                  copyable(messageObjStr),
+                ]),
+              },
+            });
 
-        if (!result) {
-          throw new Error('User rejected request');
+            if (!result) {
+              throw new SnapError('User rejected request');
+            }
+
+            const { authHandler } =
+              ExtensionService.getExtensionServiceInstance();
+            console.log(didStr);
+            const { token, authRequest } =
+              await authHandler.handleAuthorizationRequest(did, msgBts, {
+                mediaType: PROTOCOL_CONSTANTS.MediaType.SignedMessage,
+                packerOptions: jwsPackerOpts,
+              });
+            console.log(token);
+
+            await fetch(`${authRequest?.body?.callbackUrl}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: token,
+            });
+            return 'auth ok';
+          }
+          case PROTOCOL_CONSTANTS.PROTOCOL_MESSAGE_TYPE
+            .CREDENTIAL_OFFER_MESSAGE_TYPE: {
+            const { packageMgr, credWallet } =
+              ExtensionService.getExtensionServiceInstance();
+            console.log('fetching credentials...');
+            const fetchHandler = new FetchHandler(packageMgr);
+            const credentials = await fetchHandler.handleCredentialOffer(
+              msgBts,
+              {
+                mediaType: PROTOCOL_CONSTANTS.MediaType.SignedMessage,
+                packerOptions: jwsPackerOpts,
+              },
+            );
+            console.log('finish fetching credentials', credentials);
+
+            await credWallet.saveAll(credentials);
+
+            return 'fetching credentials ok';
+          }
+          default:
+            return 'protocol message type not supported';
         }
-
-        const { authHandler } = ExtensionService.getExtensionServiceInstance();
-        console.log(didStr);
-        const { token, authRequest } =
-          await authHandler.handleAuthorizationRequest(did, msgBts, {
-            mediaType: PROTOCOL_CONSTANTS.MediaType.SignedMessage,
-            packerOptions: jwsPackerOpts,
-          });
-        console.log(token);
-
-        await fetch(`${authRequest?.body?.callbackUrl}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: token,
-        });
-      } catch (e) {
-        console.error(e);
-        throw e;
-        /* empty */
+      } catch (error: any) {
+        console.error(error);
+        throw new SnapError(error.message);
       }
-      break;
     }
-
-    case 'fetchCredential': {
-      try {
-        const { packageMgr, credWallet } =
-          ExtensionService.getExtensionServiceInstance();
-        console.log('fetching credentials...');
-        const fetchHandler = new FetchHandler(packageMgr);
-        const msgBts = await getMsgBytes(request.params.msg);
-        const credentials = await fetchHandler.handleCredentialOffer(msgBts, {
-          mediaType: PROTOCOL_CONSTANTS.MediaType.SignedMessage,
-          packerOptions: jwsPackerOpts,
-        });
-        console.log('finish fetching credentials', credentials);
-
-        await credWallet.saveAll(credentials);
-      } catch (e) {
-        console.error(e);
-        throw e;
-      }
-      break;
-    }
-
     default: {
-      console.warn('no action');
-      break;
+      return 'no message handle';
     }
   }
 
-  return Promise.resolve();
+  return 'message handle ok';
 };

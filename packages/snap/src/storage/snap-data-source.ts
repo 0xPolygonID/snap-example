@@ -1,10 +1,11 @@
-import { IDataSource } from '@0xpolygonid/js-sdk';
+import type { IDataSource } from '@0xpolygonid/js-sdk';
+
 import { snapStorage } from '../rpc/store';
 
 export class SnapDataSource<Type> implements IDataSource<Type> {
   // eslint-disable-next-line @typescript-eslint/no-parameter-properties
-  constructor(private _snapStorageKey: string) {
-    this.init().then();
+  constructor(private readonly _snapStorageKey: string) {
+    this.init().then(console.log).catch(console.error);
   }
 
   async init() {

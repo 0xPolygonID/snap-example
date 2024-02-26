@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.10",
+  "version": "0.1.0",
   "description": "PolygonID MetaMask snap example",
   "proposedName": "PolygonID MetaMask snap example",
   "repository": {
@@ -7,12 +7,12 @@
     "url": "https://github.com/0xPolygonID/snap-example.git"
   },
   "source": {
-    "shasum": "+Z6cE0Lm3shx1WXzgQ7NKUdjCjJy1DscQivKg0QmLq0=",
+    "shasum": "3jrDeMscWWv7axY5PJYYdGotbrUriI7ENao6v2t892Y=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "@0xpolygonid/snap-example",
+        "packageName": "snap",
         "registry": "https://registry.npmjs.org/"
       }
     }
@@ -28,8 +28,7 @@
     "endowment:ethereum-provider": {},
     "endowment:transaction-insight": {},
     "snap_manageState": {},
-    "endowment:webassembly": {},
-    "endowment:long-running": {}
+    "endowment:webassembly": {}
   },
   "manifestVersion": "0.1"
 }

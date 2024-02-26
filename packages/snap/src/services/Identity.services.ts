@@ -1,4 +1,7 @@
-import { core, CredentialStatusType, W3CCredential } from '@0xpolygonid/js-sdk';
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import type { W3CCredential } from '@0xpolygonid/js-sdk';
+import { core, CredentialStatusType } from '@0xpolygonid/js-sdk';
+
 import { RHS_URL } from '../constants';
 import { ExtensionService } from './Extension.service';
 
@@ -10,13 +13,13 @@ export class IdentityServices {
       const { wallet } = ExtensionService.getExtensionServiceInstance();
 
       const identity = await wallet.createIdentity({
-        method: core.DidMethod.Iden3,
-        blockchain: core.Blockchain.Polygon,
-        networkId: core.NetworkId.Mumbai,
+        method: core.DidMethod.Iden3!,
+        blockchain: core.Blockchain.Polygon!,
+        networkId: core.NetworkId.Mumbai!,
         seed,
         revocationOpts: {
           type: CredentialStatusType.Iden3ReverseSparseMerkleTreeProof,
-          baseUrl: RHS_URL,
+          id: RHS_URL,
         },
       });
       console.log('!!!!!!!!!!!!!!!!', identity);

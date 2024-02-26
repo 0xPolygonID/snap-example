@@ -1,27 +1,30 @@
-import { proving } from '@iden3/js-jwz';
+import type {
+  CredentialStorage,
+  CredentialWallet,
+  IdentityStorage,
+  IdentityWallet,
+  KMS,
+  core,
+} from '@0xpolygonid/js-sdk';
 import {
   AuthHandler,
   CircuitId,
-  CredentialStorage,
-  CredentialWallet,
   DataPrepareHandlerFunc,
   EthStateStorage,
-  IdentityStorage,
-  IdentityWallet,
   JWSPacker,
-  KMS,
   PackageManager,
   PlainPacker,
   ProofService,
   VerificationHandlerFunc,
   ZKPPacker,
 } from '@0xpolygonid/js-sdk';
-import { DID } from '@iden3/js-iden3-core';
+import { proving } from '@iden3/js-jwz';
+import type { DIDResolutionOptions, DIDResolutionResult } from 'did-resolver';
+
 import { defaultEthConnectionConfig, INIT } from '../constants';
-import { SnapMerkleTreeLocalStorage } from '../storage/snap-merkletree-store';
+import type { SnapMerkleTreeLocalStorage } from '../storage/snap-merkletree-store';
 import { CircuitStorageInstance } from './CircuitStorage';
 import { WalletService } from './Wallet.service';
-import { DIDResolutionOptions, DIDResolutionResult } from 'did-resolver';
 
 export class ExtensionService {
   static instanceES: {
@@ -40,12 +43,15 @@ export class ExtensionService {
   };
 
   static async init() {
+    console.log('before CircuitStorageInstance');
     await CircuitStorageInstance.init();
 
     const accountInfo = await WalletService.createWallet();
     const { wallet, credWallet, dataStorage, kms } = accountInfo;
+    console.log('after WalletService.createWallet');
 
     const circuitStorage = CircuitStorageInstance.getCircuitStorageInstance();
+    console.log('after CircuitStorageInstance');
 
     const proofService = new ProofService(
       wallet,
@@ -54,6 +60,7 @@ export class ExtensionService {
       new EthStateStorage(defaultEthConnectionConfig),
       { ipfsGatewayURL: 'https://ipfs.io' },
     );
+    console.log('after ProofService');
 
     const packageMgr = await ExtensionService.getPackageMgr(
       await circuitStorage.loadCircuitData(CircuitId.AuthV2),
@@ -61,8 +68,10 @@ export class ExtensionService {
       proofService.verifyState.bind(proofService),
       kms,
     );
+    console.log('after ExtensionService.getPackageMgr');
 
     const authHandler = new AuthHandler(packageMgr, proofService);
+    console.log('after AuthHandler');
 
     if (!this.instanceES) {
       this.instanceES = {
@@ -87,8 +96,16 @@ export class ExtensionService {
       provingKey: any;
     },
     prepareFn: {
-      (hash: Uint8Array, did: DID, circuitId: CircuitId): Promise<Uint8Array>;
-      (hash: Uint8Array, did: DID, circuitId: CircuitId): Promise<Uint8Array>;
+      (
+        hash: Uint8Array,
+        did: core.DID,
+        circuitId: CircuitId,
+      ): Promise<Uint8Array>;
+      (
+        hash: Uint8Array,
+        did: core.DID,
+        circuitId: CircuitId,
+      ): Promise<Uint8Array>;
     },
     stateVerificationFn: {
       (circuitId: string, pubSignals: string[]): Promise<boolean>;

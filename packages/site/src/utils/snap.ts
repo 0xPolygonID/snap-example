@@ -1,17 +1,21 @@
+/* eslint-disable id-denylist */
+import type { MetaMaskInpageProvider } from '@metamask/providers';
+
 import { defaultSnapOrigin } from '../config';
-import { GetSnapsResponse, Snap } from '../types';
+import type { GetSnapsResponse, Snap } from '../types';
 
 /**
  * Get the installed snaps in MetaMask.
  *
+ * @param provider - The MetaMask inpage provider.
  * @returns The snaps installed in MetaMask.
  */
-export const getSnaps = async (): Promise<GetSnapsResponse> => {
-  return (await window.ethereum.request({
+export const getSnaps = async (
+  provider?: MetaMaskInpageProvider,
+): Promise<GetSnapsResponse> =>
+  (await (provider ?? window.ethereum).request({
     method: 'wallet_getSnaps',
   })) as unknown as GetSnapsResponse;
-};
-
 /**
  * Connect a snap to MetaMask.
  *
@@ -22,18 +26,12 @@ export const connectSnap = async (
   snapId: string = defaultSnapOrigin,
   params: Record<'version' | string, unknown> = {},
 ) => {
-  try {
-    const result = await window.ethereum.request({
-      method: 'wallet_requestSnaps',
-      params: {
-        [snapId]: params,
-      },
-    });
-    console.log('connectSnap', result);
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  await window.ethereum.request({
+    method: 'wallet_requestSnaps',
+    params: {
+      [snapId]: params,
+    },
+  });
 };
 
 /**
@@ -50,11 +48,13 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
       (snap) =>
         snap.id === defaultSnapOrigin && (!version || snap.version === version),
     );
-  } catch (e) {
-    console.log('Failed to obtain installed snap', e);
+  } catch (error) {
+    console.log('Failed to obtain installed snap', error);
     return undefined;
   }
 };
+
+export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
 
 export const getStore = async () => {
   return await window.ethereum.request({
@@ -71,7 +71,7 @@ export const clearStore = async () => {
 };
 
 export const handleRequest = async (requestBase64: string) => {
-  console.log('site:handleRequest', requestBase64);
+  console.log(`site:handleRequest`, requestBase64);
   return await window.ethereum.request({
     method: `wallet_invokeSnap`,
     params: {
@@ -110,5 +110,3 @@ export const getListCredentialRequest = async () => {
     },
   });
 };
-
-export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
