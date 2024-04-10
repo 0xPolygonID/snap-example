@@ -12,6 +12,7 @@ import {
   IssuerResolver,
   OnChainResolver,
   RHSResolver,
+  Ed25519KeyProvider,
 } from '@0xpolygonid/js-sdk';
 
 import { defaultEthConnectionConfig } from '../constants';
@@ -23,8 +24,13 @@ export class WalletService {
     const keyStore = new SnapStoragePrivateKeyStore();
     // const memoryKeyStore = new InMemoryPrivateKeyStore();
     const bjjProvider = new BjjProvider(KmsKeyType.BabyJubJub, keyStore);
+    const ed25519Provider = new Ed25519KeyProvider(
+      KmsKeyType.Ed25519,
+      keyStore,
+    );
     const kms = new KMS();
     kms.registerKeyProvider(KmsKeyType.BabyJubJub, bjjProvider);
+    kms.registerKeyProvider(KmsKeyType.Ed25519, ed25519Provider);
 
     const dataStorage = {
       credential: new CredentialStorage(

@@ -28,7 +28,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@0xpolygonid/js-sdk": "1.7.5",
+    "@0xpolygonid/js-sdk": "1.9.2",
     "@iden3/js-crypto": "1.0.3",
     "@iden3/js-iden3-core": "1.2.1",
     "@iden3/js-jsonld-merklization": "1.1.2",
