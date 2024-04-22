@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/0xPolygonID/snap-example.git"
   },
-  "license": "(MIT-0 OR Apache-2.0)",
+  "license": "MIT or Apache-2.0",
   "author": "",
   "workspaces": [
     "packages/*"
