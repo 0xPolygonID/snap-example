@@ -1,8 +1,7 @@
 import type { EthConnectionConfig } from '@0xpolygonid/js-sdk';
 
 export const RHS_URL = 'https://rhs-staging.polygonid.me';
-export const RPC_URL =
-  'https://polygon-mumbai.g.alchemy.com/v2/BI7_GYAO787OflUC7E6DhMJNkhkyq7kp';
+export const RPC_URL = '';
 
 export const defaultEthConnectionConfig: EthConnectionConfig = {
   url: RPC_URL,
@@ -11,7 +10,7 @@ export const defaultEthConnectionConfig: EthConnectionConfig = {
   maxGasPrice: '100000000000',
   confirmationBlockCount: 5,
   confirmationTimeout: 600000,
-  contractAddress: '0x134B1BE34911E39A8397ec6289782989729807a4',
+  contractAddress: '0x1a4cC30f2aA0377b0c3bc9848766D90cb4404124',
   receiptTimeout: 600000,
   rpcResponseTimeout: 5000,
   waitReceiptCycleTime: 30000,

@@ -11,6 +11,7 @@ import {
   hexToBytes,
   FetchHandler,
   byteDecoder,
+  base64UrlToBytes,
 } from '@0xpolygonid/js-sdk';
 import type { OnRpcRequestHandler } from '@metamask/snaps-sdk';
 import {
@@ -65,14 +66,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   const jwsPackerOpts: JWSPackerParams = {
     alg: 'ES256K-R',
     // eslint-disable-next-line id-denylist
-    signer: (_: any, msg: any) => {
-      return async () => {
-        const signature = (await ES256KSigner(
-          hexToBytes(privKey),
-          true,
-        )(msg)) as string;
-        return signature;
-      };
+    signer: async (_, data) => {
+      const signatureBase64 = await ES256KSigner(
+        hexToBytes(privKey),
+        true,
+      )(data);
+
+      return base64UrlToBytes(signatureBase64.toString());
     },
   };
 
